@@ -1,5 +1,6 @@
 <script>
   import { onMount } from 'svelte';
+  import hobbiesStore from './hobbies-store.js';
 
   export let appName;
 
@@ -16,6 +17,7 @@
     })
     .then(data => {
       hobbies = Object.values(data);
+      hobbiesStore.setHobbies(hobbies);
       return hobbies;
     })
     .catch(err => {
@@ -25,6 +27,7 @@
 
   function addHobby() {
     hobbies = [hobbyInput.value, ...hobbies];
+    hobbiesStore.addHobby(hobbyInput.value);
 
     isLoading = true;
 
@@ -71,7 +74,7 @@
   {/if}
 </div> -->
 
-<div>
+<!-- <div>
   {#await getHobbies}
     <p>Loading...</p>
   {:then hobbiesData} 
@@ -83,6 +86,18 @@
   {:catch error}
     <p>{error.message}</p>
   {/await}
+</div> -->
+
+<div>
+  {#if isLoading}
+    <p>Loading...</p>
+  {:else}
+    <ul>
+      {#each $hobbiesStore as hobby}
+        <li>{hobby}</li>
+      {/each}
+    </ul>
+  {/if}
 </div>
 
 <style>
