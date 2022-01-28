@@ -7,21 +7,20 @@
   let hobbies = [];
   let isLoading = false;
 
-  onMount(() => {
-    fetch('https://vue-http-exmp-default-rtdb.firebaseio.com/svelte-hobbies.json')
-      .then(res => {
-        if(!res.ok) {
-          throw new Error('Error fatching the hobbies')
-        }
-        return res.json();
-      })
-      .then(data => {
-        hobbies = Object.values(data);
-      })
-      .catch(err => {
-        console.log(err.message);
-      });
-  });
+  const getHobbies = fetch('https://vue-http-exmp-default-rtdb.firebaseio.com/svelte-hobbies.json')
+    .then(res => {
+      if(!res.ok) {
+        throw new Error('Error fatching the hobbies')
+      }
+      return res.json();
+    })
+    .then(data => {
+      hobbies = Object.values(data);
+      return hobbies;
+    })
+    .catch(err => {
+      console.log(err.message);
+    });
 
 
   function addHobby() {
@@ -60,7 +59,7 @@
   <button on:click="{addHobby}">Add Hobby</button>
 </div>
 
-<div>
+<!-- <div>
   {#if isLoading}
     <p>Loading...</p>
   {:else}
@@ -70,6 +69,20 @@
       {/each}
     </ul>
   {/if}
+</div> -->
+
+<div>
+  {#await getHobbies}
+    <p>Loading...</p>
+  {:then hobbiesData} 
+    <ul>
+      {#each hobbiesData as hobby}
+        <li>{hobby}</li>
+      {/each}
+    </ul> 
+  {:catch error}
+    <p>{error.message}</p>
+  {/await}
 </div>
 
 <style>
