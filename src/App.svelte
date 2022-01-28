@@ -1,23 +1,28 @@
 <script>
+  import { onMount } from 'svelte';
+
   export let appName;
 
   let hobbyInput;
   let hobbies = [];
   let isLoading = false;
 
-  fetch('https://vue-http-exmp-default-rtdb.firebaseio.com/svelte-hobbies.json')
-    .then(res => {
-      if(!res.ok) {
-        throw new Error('Error fatching the hobbies')
-      }
-      return res.json();
-    })
-    .then(data => {
-      hobbies = Object.values(data);
-    })
-    .catch(err => {
-      console.log(err.message);
-    });
+  onMount(() => {
+    fetch('https://vue-http-exmp-default-rtdb.firebaseio.com/svelte-hobbies.json')
+      .then(res => {
+        if(!res.ok) {
+          throw new Error('Error fatching the hobbies')
+        }
+        return res.json();
+      })
+      .then(data => {
+        hobbies = Object.values(data);
+      })
+      .catch(err => {
+        console.log(err.message);
+      });
+  });
+
 
   function addHobby() {
     hobbies = [hobbyInput.value, ...hobbies];

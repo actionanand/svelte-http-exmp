@@ -74,6 +74,14 @@ var app = (function () {
     function set_current_component(component) {
         current_component = component;
     }
+    function get_current_component() {
+        if (!current_component)
+            throw new Error('Function called outside component initialization');
+        return current_component;
+    }
+    function onMount(fn) {
+        get_current_component().$$.on_mount.push(fn);
+    }
 
     const dirty_components = [];
     const binding_callbacks = [];
@@ -384,7 +392,7 @@ var app = (function () {
     	return child_ctx;
     }
 
-    // (61:2) {:else}
+    // (66:2) {:else}
     function create_else_block(ctx) {
     	let ul;
     	let each_value = /*hobbies*/ ctx[2];
@@ -403,7 +411,7 @@ var app = (function () {
     				each_blocks[i].c();
     			}
 
-    			add_location(ul, file, 61, 4, 1347);
+    			add_location(ul, file, 66, 4, 1435);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, ul, anchor);
@@ -447,14 +455,14 @@ var app = (function () {
     		block,
     		id: create_else_block.name,
     		type: "else",
-    		source: "(61:2) {:else}",
+    		source: "(66:2) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (59:2) {#if isLoading}
+    // (64:2) {#if isLoading}
     function create_if_block(ctx) {
     	let p;
 
@@ -462,7 +470,7 @@ var app = (function () {
     		c: function create() {
     			p = element("p");
     			p.textContent = "Loading...";
-    			add_location(p, file, 59, 4, 1315);
+    			add_location(p, file, 64, 4, 1403);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, p, anchor);
@@ -477,14 +485,14 @@ var app = (function () {
     		block,
     		id: create_if_block.name,
     		type: "if",
-    		source: "(59:2) {#if isLoading}",
+    		source: "(64:2) {#if isLoading}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (63:6) {#each hobbies as hobby}
+    // (68:6) {#each hobbies as hobby}
     function create_each_block(ctx) {
     	let li;
     	let t_value = /*hobby*/ ctx[6] + "";
@@ -494,7 +502,7 @@ var app = (function () {
     		c: function create() {
     			li = element("li");
     			t = text(t_value);
-    			add_location(li, file, 63, 8, 1391);
+    			add_location(li, file, 68, 8, 1479);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, li, anchor);
@@ -512,7 +520,7 @@ var app = (function () {
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(63:6) {#each hobbies as hobby}",
+    		source: "(68:6) {#each hobbies as hobby}",
     		ctx
     	});
 
@@ -560,18 +568,18 @@ var app = (function () {
     			div2 = element("div");
     			if_block.c();
     			attr_dev(h1, "class", "capitalize-it svelte-5jciqj");
-    			add_location(h1, file, 48, 2, 1085);
+    			add_location(h1, file, 53, 2, 1173);
     			attr_dev(div0, "class", "title-wrap svelte-5jciqj");
-    			add_location(div0, file, 47, 0, 1058);
+    			add_location(div0, file, 52, 0, 1146);
     			attr_dev(label, "for", "hobby");
-    			add_location(label, file, 52, 2, 1142);
+    			add_location(label, file, 57, 2, 1230);
     			attr_dev(input, "type", "text");
     			attr_dev(input, "id", "hobby");
-    			add_location(input, file, 53, 2, 1172);
+    			add_location(input, file, 58, 2, 1260);
     			attr_dev(button, "class", "svelte-5jciqj");
-    			add_location(button, file, 54, 2, 1230);
-    			add_location(div1, file, 51, 0, 1134);
-    			add_location(div2, file, 57, 0, 1287);
+    			add_location(button, file, 59, 2, 1318);
+    			add_location(div1, file, 56, 0, 1222);
+    			add_location(div2, file, 62, 0, 1375);
     		},
     		l: function claim(nodes) {
     			throw new Error_1("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -646,16 +654,18 @@ var app = (function () {
     	let hobbies = [];
     	let isLoading = false;
 
-    	fetch('https://vue-http-exmp-default-rtdb.firebaseio.com/svelte-hobbies.json').then(res => {
-    		if (!res.ok) {
-    			throw new Error('Error fatching the hobbies');
-    		}
+    	onMount(() => {
+    		fetch('https://vue-http-exmp-default-rtdb.firebaseio.com/svelte-hobbies.json').then(res => {
+    			if (!res.ok) {
+    				throw new Error('Error fatching the hobbies');
+    			}
 
-    		return res.json();
-    	}).then(data => {
-    		$$invalidate(2, hobbies = Object.values(data));
-    	}).catch(err => {
-    		console.log(err.message);
+    			return res.json();
+    		}).then(data => {
+    			$$invalidate(2, hobbies = Object.values(data));
+    		}).catch(err => {
+    			console.log(err.message);
+    		});
     	});
 
     	function addHobby() {
@@ -700,6 +710,7 @@ var app = (function () {
     	};
 
     	$$self.$capture_state = () => ({
+    		onMount,
     		appName,
     		hobbyInput,
     		hobbies,
