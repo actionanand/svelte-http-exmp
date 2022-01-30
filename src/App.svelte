@@ -1,11 +1,14 @@
 <script>
+  import { onMount } from 'svelte';
+  import hobbiesStore from './hobbies-store.js';
+
   export let appName;
 
   let hobbyInput;
   let hobbies = [];
   let isLoading = false;
 
-  fetch('https://vue-http-exmp-default-rtdb.firebaseio.com/svelte-hobbies.json')
+  const getHobbies = fetch('https://vue-http-exmp-default-rtdb.firebaseio.com/svelte-hobbies.json')
     .then(res => {
       if(!res.ok) {
         throw new Error('Error fatching the hobbies')
@@ -14,13 +17,17 @@
     })
     .then(data => {
       hobbies = Object.values(data);
+      hobbiesStore.setHobbies(hobbies);
+      return hobbies;
     })
     .catch(err => {
       console.log(err.message);
     });
 
+
   function addHobby() {
     hobbies = [hobbyInput.value, ...hobbies];
+    hobbiesStore.addHobby(hobbyInput.value);
 
     isLoading = true;
 
@@ -55,12 +62,38 @@
   <button on:click="{addHobby}">Add Hobby</button>
 </div>
 
-<div>
+<!-- <div>
   {#if isLoading}
     <p>Loading...</p>
   {:else}
     <ul>
       {#each hobbies as hobby}
+        <li>{hobby}</li>
+      {/each}
+    </ul>
+  {/if}
+</div> -->
+
+<!-- <div>
+  {#await getHobbies}
+    <p>Loading...</p>
+  {:then hobbiesData} 
+    <ul>
+      {#each hobbiesData as hobby}
+        <li>{hobby}</li>
+      {/each}
+    </ul> 
+  {:catch error}
+    <p>{error.message}</p>
+  {/await}
+</div> -->
+
+<div>
+  {#if isLoading}
+    <p>Loading...</p>
+  {:else}
+    <ul>
+      {#each $hobbiesStore as hobby}
         <li>{hobby}</li>
       {/each}
     </ul>
